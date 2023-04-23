@@ -11,20 +11,21 @@ class RemoteRepositoryManager:
     def get_text(self, remote_path: str):
         return self._repo.get_contents(remote_path).decoded_content.decode().replace('\r', '')
 
-    def update_file(self, local_path: str, remote_path: str, message: str):
-        contents = self._repo.get_contents(remote_path)
+    def update_file(self, new_text: str, remote_path: str, message: str):
+        new_text = new_text.replace('\r', '')
 
-        with open(local_path) as f:
-            new_text = f.read()
+        contents = self._repo.get_contents(remote_path)
 
         # don't use get_text() to avoid unnecessary API calls
         old_text = contents.decoded_content.decode().replace('\r', '')
         if old_text == new_text:
-            logging.info(f'GitHub: Skipping the file "{local_path}" - no difference in content with the remote file.')
+            logging.info(
+                f'GitHub: Skipping the file "{remote_path}" - no difference in content with the received data.'
+            )
             return
 
         if not self._is_new_file_valid(new_text, old_text):
-            logging.info(f'GitHub: Skipping the file "{local_path}" - the file is invalid.')
+            logging.info(f'GitHub: Skipping the file "{remote_path}" - the received data is invalid.')
             return
 
         self._repo.update_file(contents.path, message, new_text, contents.sha)
