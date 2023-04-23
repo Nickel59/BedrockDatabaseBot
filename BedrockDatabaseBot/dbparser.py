@@ -9,7 +9,7 @@ from natsort import natsorted
 AVAILABLE_ARCHITECTURES = ['x64', 'x86', 'arm']
 
 
-def run(releases_str: str, betas_str: str, previews_str: str, output_file_path: str):
+def run(releases_str: str, betas_str: str, previews_str: str) -> str:
     line_collection = _read_lines(releases_str, betas_str, previews_str)
 
     release_parsed_lines = _parse_lines(line_collection.releases, 'release')
@@ -21,10 +21,7 @@ def run(releases_str: str, betas_str: str, previews_str: str, output_file_path: 
     version_dict_list = _get_version_dict_list(version_info_list)
     version_dict_list = natsorted(version_dict_list, key=itemgetter(*['name']))
 
-    result = json.dumps(version_dict_list, indent=4)
-    with open(output_file_path, 'w') as f:
-        json.dump(version_dict_list, f, indent=4)
-    # print(result)
+    return json.dumps(version_dict_list, indent=4)
 
 
 @dataclass(slots=True)
