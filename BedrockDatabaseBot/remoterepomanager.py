@@ -8,7 +8,7 @@ class RemoteRepositoryManager:
     def __init__(self):
         self._repo = Github(self._get_token()).get_user().get_repo('BedrockDB')
 
-    def get_text(self, remote_path: str):
+    def get_text(self, remote_path: str) -> str:
         return self._repo.get_contents(remote_path).decoded_content.decode().replace('\r', '')
 
     def update_file(self, new_text: str, remote_path: str, message: str):
