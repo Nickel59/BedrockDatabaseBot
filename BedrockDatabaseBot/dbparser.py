@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from operator import itemgetter
 from copy import deepcopy
-import json
 
 from natsort import natsorted
 
@@ -9,22 +8,17 @@ from natsort import natsorted
 AVAILABLE_ARCHITECTURES = ['x64', 'x86', 'arm']
 
 
-def run(releases_str: str, betas_str: str, previews_str: str, output_file_path: str):
-    line_collection = _read_lines(releases_str, betas_str, previews_str)
-
-    release_parsed_lines = _parse_lines(line_collection.releases, 'release')
-    beta_parsed_lines = _parse_lines(line_collection.betas, 'beta')
-    preview_parsed_lines = _parse_lines(line_collection.previews, 'preview')
+def run(release_strings: list[str], beta_strings: list[str], preview_strings: list[str]) -> list[dict]:
+    release_parsed_lines = _parse_lines(release_strings, 'release')
+    beta_parsed_lines = _parse_lines(beta_strings, 'beta')
+    preview_parsed_lines = _parse_lines(preview_strings, 'preview')
 
     version_info_list = _get_version_info_list(release_parsed_lines + beta_parsed_lines + preview_parsed_lines)
 
     version_dict_list = _get_version_dict_list(version_info_list)
     version_dict_list = natsorted(version_dict_list, key=itemgetter(*['name']))
 
-    result = json.dumps(version_dict_list, indent=4)
-    with open(output_file_path, 'w') as f:
-        json.dump(version_dict_list, f, indent=4)
-    # print(result)
+    return version_dict_list
 
 
 @dataclass(slots=True)
@@ -41,21 +35,6 @@ class _VersionInfo:
     architecture: str
     type: str
     guids: list[str]
-
-
-@dataclass(slots=True)
-class _LineCollection:
-    releases: list[str]
-    betas: list[str]
-    previews: list[str]
-
-
-def _read_lines(releases_str: str, betas_str: str, previews_str: str) -> _LineCollection:
-    release_lines = json.loads(releases_str)
-    beta_lines = json.loads(betas_str)
-    preview_lines = json.loads(previews_str)
-
-    return _LineCollection(release_lines, beta_lines, preview_lines)
 
 
 def _parse_line(line: str, version_type: str) -> _ParsedLine:

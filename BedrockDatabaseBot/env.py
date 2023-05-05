@@ -1,5 +1,3 @@
-# Local paths are the same as the remote ones.
-
 RELEASES_PATH = 'releases.json'
 BETAS_PATH = 'betas.json'
 PREVIEWS_PATH = 'previews.json'
