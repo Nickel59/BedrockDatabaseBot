@@ -1,3 +1,5 @@
+from typing import TypedDict
+import json
 import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -5,7 +7,7 @@ import time
 
 from env import RELEASES_PATH, BETAS_PATH, PREVIEWS_PATH, VERSIONS_PATH
 import requester
-import newupdatesmanager
+from database import Database
 import dbparser
 from remoterepomanager import RemoteRepositoryManager
 
@@ -47,24 +49,50 @@ def main():
 
 
 def run_one_cycle():
-    new_updates = newupdatesmanager.get_actual_new_updates(requester.run())
-    logging.info('Brand new UpdateInfo items: ' + str(new_updates))
+    new_updates = requester.run()
+    new_update_strings = get_new_update_strings(new_updates)
 
-    if not new_updates:
+    db = Database(
+        json.loads(repo_manager.get_text(RELEASES_PATH)),
+        json.loads(repo_manager.get_text(BETAS_PATH)),
+        json.loads(repo_manager.get_text(PREVIEWS_PATH)),
+    )
+
+    update_result = db.update(new_update_strings['release'], new_update_strings['preview'])
+
+    if not update_result.did_update:
+        logging.info('Did not receive any brand new UpdateInfo items.')
         return
 
-    newupdatesmanager.save_new_updates(new_updates)
-    commit_message = newupdatesmanager.get_commit_message(new_updates)
-    repo_manager.update_file(RELEASES_PATH, RELEASES_PATH, commit_message)
-    repo_manager.update_file(PREVIEWS_PATH, PREVIEWS_PATH, commit_message)
-    time.sleep(20)
-    dbparser.run(
-        repo_manager.get_text(RELEASES_PATH),
-        repo_manager.get_text(BETAS_PATH),
-        repo_manager.get_text(PREVIEWS_PATH),
-        VERSIONS_PATH
-    )
-    repo_manager.update_file(VERSIONS_PATH, VERSIONS_PATH, commit_message)
+    parsed_db = dbparser.run(db.release_strings, db.beta_strings, db.preview_strings)
+
+    repo_manager.update_file(json.dumps(db.release_strings, indent=4), RELEASES_PATH, update_result.commit_message)
+    repo_manager.update_file(json.dumps(db.beta_strings, indent=4), PREVIEWS_PATH, update_result.commit_message)
+    repo_manager.update_file(json.dumps(parsed_db, indent=4), VERSIONS_PATH, update_result.commit_message)
+
+
+# Mojang seems to have stopped releasing betas for Windows.
+# The last beta released is 1.19.34.0 released on May 19, 2022.
+# For this reason we don't touch betas here.
+
+
+class NewUpdateStrings(TypedDict):
+    release: list[str]
+    preview: list[str]
+
+
+def get_new_update_strings(new_updates: list[requester.UpdateInfo]) -> NewUpdateStrings:
+    split_new_updates = {}
+    for type_, prefix in ('release', 'Microsoft.MinecraftUWP_'), ('preview', 'Microsoft.MinecraftWindowsBeta_'):
+        split_new_updates[type_] = [
+            new_update for new_update in new_updates if new_update.package_moniker.startswith(prefix)
+        ]
+
+    new_update_strings = {}
+    for type_ in 'release', 'preview':
+        new_update_strings[type_] = [str(new_update) for new_update in split_new_updates[type_]]
+
+    return new_update_strings
 
 
 if __name__ == '__main__':
