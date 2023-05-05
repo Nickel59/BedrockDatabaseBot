@@ -43,9 +43,9 @@ def main():
             run_one_cycle()
         except Exception as e:
             logging.error(str(e))
-        print('Sleeping...')
+        logging.info('Sleeping...')
         time.sleep(600)
-        print('Sleep ended.\n')
+        logging.info('Sleep ended.\n')
 
 
 def run_one_cycle():
