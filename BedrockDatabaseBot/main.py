@@ -67,7 +67,7 @@ def run_one_cycle():
     parsed_db = dbparser.run(db.release_strings, db.beta_strings, db.preview_strings)
 
     repo_manager.update_file(json.dumps(db.release_strings, indent=4), RELEASES_PATH, update_result.commit_message)
-    repo_manager.update_file(json.dumps(db.beta_strings, indent=4), PREVIEWS_PATH, update_result.commit_message)
+    repo_manager.update_file(json.dumps(db.preview_strings, indent=4), PREVIEWS_PATH, update_result.commit_message)
     repo_manager.update_file(json.dumps(parsed_db, indent=4), VERSIONS_PATH, update_result.commit_message)
 
 
