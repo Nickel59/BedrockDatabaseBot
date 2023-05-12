@@ -17,7 +17,7 @@ class Database:
         releases_update_result = self._update_slot(self.release_strings, new_release_strings)
         previews_update_result = self._update_slot(self.preview_strings, new_preview_strings)
 
-        did_update = releases_update_result[0] or releases_update_result[0]
+        did_update = releases_update_result[0] or previews_update_result[0]
         commit_message = ' | '.join([msg for msg in (releases_update_result[1], previews_update_result[1]) if msg])
 
         return self.UpdateResult(did_update, commit_message)
