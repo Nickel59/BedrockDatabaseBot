@@ -39,9 +39,10 @@ def setup_timed_rotating_logger(log_path: str = 'logs', base_filename: str = 'bd
 
 
 def main():
+    setup_timed_rotating_logger()
+
     logging.info('--------------------START--------------------')
 
-    setup_timed_rotating_logger()
     for _ in range(3):
         try:
             run_one_cycle()
