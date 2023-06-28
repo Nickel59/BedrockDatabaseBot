@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element, fromstring
 
-from requester.net.structs import SyncUpdates, Cookie, UpdateInfo, Config
+from net.structs import SyncUpdates, Cookie, UpdateInfo, Config
 
 
 class ParsingError(ValueError):
