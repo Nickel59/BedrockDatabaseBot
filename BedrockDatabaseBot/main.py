@@ -39,8 +39,10 @@ def setup_timed_rotating_logger(log_path: str = 'logs', base_filename: str = 'bd
 
 
 def main():
+    logging.info('--------------------START--------------------')
+
     setup_timed_rotating_logger()
-    while True:
+    for _ in range(3):
         try:
             run_one_cycle()
         except Exception as e:
@@ -48,6 +50,8 @@ def main():
         logging.info('Sleeping...')
         time.sleep(600)
         logging.info('Sleep ended.\n')
+
+    logging.info('---------------------END---------------------')
 
 
 def run_one_cycle():
