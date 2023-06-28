@@ -21,6 +21,8 @@ def setup_timed_rotating_logger(log_path: str = 'logs', base_filename: str = 'bd
         filename = (filename.replace('.log', '') + '.log').lstrip('.')
         return os.path.join(parent_dir_path, filename)
 
+    os.makedirs(log_path, exist_ok=True)
+
     log_filename = os.path.join(log_path, base_filename + '.log')
 
     handler = TimedRotatingFileHandler(log_filename, when="midnight", backupCount=30)
