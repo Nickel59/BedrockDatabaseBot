@@ -3,8 +3,8 @@ from xml.etree.ElementTree import Element
 import json
 import logging
 
-from .net.structs import UpdateInfo, Cookie
-from .net import soap, parsers, envelope_factories
+from net.structs import UpdateInfo, Cookie
+from net import envelope_factories, parsers, soap
 
 URL = 'https://fe3cr.delivery.mp.microsoft.com/ClientWebService/client.asmx'
 SECURED_URL = 'https://fe3cr.delivery.mp.microsoft.com/ClientWebService/client.asmx/secured'
@@ -23,7 +23,7 @@ CATEGORY_IDS = {
 }
 
 
-def main() -> list[UpdateInfo]:
+def run() -> list[UpdateInfo]:
     sync_updates_response_envelope = _get_sync_updates_response_envelope()
     sync_updates = parsers.parse_sync_updates_response_envelope(sync_updates_response_envelope)
 
@@ -63,7 +63,7 @@ def _get_sync_updates_response_envelope():
 
     try:
         return func(_load_last_cookie())
-    except soap.SOAPError as e:
+    except (soap.SOAPError, FileNotFoundError) as e:
         logging.error(str(e) + ' Trying again.')
 
         get_config_response_envelope = soap.post_envelope(

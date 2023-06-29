@@ -1,7 +1,7 @@
 from xml.etree.ElementTree import Element, SubElement
 from datetime import datetime, timedelta
 
-from requester.net.structs import Cookie
+from net.structs import Cookie
 
 
 WUCLIENT = 'http://www.microsoft.com/SoftwareDistribution/Server/ClientWebService'
