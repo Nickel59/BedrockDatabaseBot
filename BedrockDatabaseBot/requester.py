@@ -3,8 +3,8 @@ from xml.etree.ElementTree import Element
 import json
 import logging
 
-from BedrockDatabaseBot.net.structs import UpdateInfo, Cookie
-from BedrockDatabaseBot.net import envelope_factories, parsers, soap
+from net.structs import UpdateInfo, Cookie
+from net import envelope_factories, parsers, soap
 
 URL = 'https://fe3cr.delivery.mp.microsoft.com/ClientWebService/client.asmx'
 SECURED_URL = 'https://fe3cr.delivery.mp.microsoft.com/ClientWebService/client.asmx/secured'
