@@ -43,14 +43,16 @@ def main():
 
     logging.info('--------------------START--------------------')
 
-    for _ in range(3):
+    number_of_cycles = 3
+    for i in range(number_of_cycles):
         try:
             run_one_cycle()
         except Exception as e:
             logging.error(str(e))
-        logging.info('Sleeping...')
-        time.sleep(600)
-        logging.info('Sleep ended.\n')
+        if i < number_of_cycles - 1:
+            logging.info('Sleeping...')
+            time.sleep(600)
+            logging.info('Sleep ended.\n')
 
     logging.info('---------------------END---------------------')
 
